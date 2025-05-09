@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #1CB5E0, #000851);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 500px;
+      height: 95vh;
+      background-color: #fff;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #000851;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .chat-box {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+    }
+    .chat-message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 15px;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+    .user-msg {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      text-align: right;
+      margin-left: auto;
+    }
+    .bot-msg {
+      background-color: #f1f0f0;
+      align-self: flex-start;
+      text-align: left;
+      margin-right: auto;
+    }
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      background: #f9f9f9;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      font-size: 1rem;
+    }
+    .chat-input button {
+      margin-left: 8px;
+      padding: 12px 20px;
+      background-color: #000851;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .chat-input button:hover {
+      background-color: #1CB5E0;
+    }
+
+    @media (max-width: 480px) {
+      .chat-header {
+        font-size: 1rem;
+        padding: 12px;
+      }
+      .chat-input input {
+        font-size: 0.95rem;
+      }
+      .chat-input button {
+        font-size: 0.9rem;
+        padding: 10px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">🤖 Google search Chatbot</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatBox = document.getElementById("chatBox");
+      const message = input.value.trim();
+      if (!message) return;
+
+      const userDiv = document.createElement("div");
+      userDiv.className = "chat-message user-msg";
+      userDiv.textContent = message;
+      chatBox.appendChild(userDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        const botDiv = document.createElement("div");
+        botDiv.className = "chat-message bot-msg";
+        botDiv.innerHTML  = marked.parse(data.response);
+        chatBox.appendChild(botDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      } catch (error) {
+        const botDiv = document.createElement("div");
+        botDiv.className = "chat-message bot-msg";
+        botDiv.textContent = "⚠️ Error: Could not connect to server.";
+        chatBox.appendChild(botDiv);
+      }
+    }
+  </script>
+</body>
+</html>
