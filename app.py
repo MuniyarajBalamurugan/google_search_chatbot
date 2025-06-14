@@ -52,6 +52,7 @@ def register():
 
 @app.route('/login', methods=['POST'])
 def login():
+    print("Login endpoint hit") 
     return jsonify({"status": "success", "message": "Login successful"})
    
 if __name__ == "__main__":
