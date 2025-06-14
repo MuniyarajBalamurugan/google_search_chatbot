@@ -45,6 +45,15 @@ def chat():
     response = asyncio.run(call_agent_async(user_msg))
     return jsonify({'response': response})
 
+
+@app.route('/register', methods=['POST'])
+def register():
+    return jsonify({"status": "success", "message": "User registered successfully"})
+
+@app.route('/login', methods=['POST'])
+def login():
+    return jsonify({"status": "success", "message": "Login successful"})
+   
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))  # Use default 10000 or 5000
